@@ -1,0 +1,129 @@
+name: MyProject
+version: 1.0.0
+schema: v1
+models:
+  - name: Qwen2.5-Coder 1.5B
+    provider: ollama
+    model: qwen2.5-coder:1.5b-base
+    roles:
+      - autocomplete
+  - name: Nomic Embed
+    provider: ollama
+    model: nomic-embed-text:latest
+    roles:
+      - embed
+  - name: Claude 4 Sonnet
+    provider: bedrock
+    env:
+      profile: bedrock
+      region: us-east-1
+    model: us.anthropic.claude-sonnet-4-20250514-v1:0
+    roles:
+      - chat
+      - edit
+      - apply
+      - summarize
+    defaultCompletionOptions:
+      temperature: 0.3
+      maxTokens: 4000
+      topP: 0.95
+    chatOptions:
+      baseSystemMessage: You are an expert coding assistant. Always think step by step
+        and provide clear, helpful responses.
+  - name: Claude 4 Agent
+    provider: bedrock
+    env:
+      profile: bedrock
+      region: us-east-1
+    model: us.anthropic.claude-sonnet-4-20250514-v1:0
+    roles:
+      - chat
+      - edit
+    defaultCompletionOptions:
+      temperature: 0.1
+      maxTokens: 8000
+      topP: 0.95
+    chatOptions:
+      baseSystemMessage: You are an expert coding assistant with access to tools.
+        Always think step by step and use the appropriate tools to complete
+        tasks efficiently.
+  - name: Claude 4 Sonnet with Architecture
+    provider: bedrock
+    env:
+      profile: bedrock
+      region: us-east-1
+    model: us.anthropic.claude-sonnet-4-20250514-v1:0
+    roles:
+      - chat
+      - edit
+      - apply
+      - summarize
+    defaultCompletionOptions:
+      temperature: 0.3
+      maxTokens: 4000
+      topP: 0.95
+    chatOptions:
+      baseSystemMessage: |
+        You are an expert coding assistant with direct access to live Snowflake architecture data tables via MCP tools. These tables serve as the single source of truth for application structure analysis, dependencies, and relationships. 
+        
+        **IMPORTANT**: Always use the MCP tools to query actual data rather than making assumptions. When asked about architecture, relationships, or data structure, use the available tools to get current, accurate information.
+
+        ## Available MCP Tools:
+        - **query_architecture_table**: Query specific tables with optional filtering 
+        - **get_table_schema**: Get column information and schema details for tables  
+        - **search_architecture_data**: Search across tables for specific patterns or relationships
+
+        ## Available Architecture Tables:
+
+        ### Core Entity Tables:
+        - **BASE_NAMES**: Source table naming information (primary key for base tables)
+        - **VIEW_NAMES**: View table naming information (primary key for view tables)
+        - **BASE_TABLE**: Source table definitions with column names as primary keys, linked to BASE_NAMES
+        - **VIEW_TABLE**: View table definitions with column names as primary keys, linked to VIEW_NAMES
+
+        ### Lineage & Dependency Tables:
+        - **VIEW_TO_SOURCE_COLUMN_LINEAGE**: Raw column lineage data extracted from Python scripts analyzing view definitions to identify source tables and columns
+        - **VIEW_TO_SOURCE_COLUMN_LINEAGE_V**: Enhanced column lineage view that maps to BASE_TABLE columns and BASE_NAMES for complete traceability
+
+        ### Application Integration Tables:
+        - **ACTION_TO_ENDPOINTS_TABLES_MAPPING**: Raw data from Python analysis covering frontend functions, backend routes, URLs, triggered tables, stored procedures, flow calls, and response model columns
+        - **ACTION_TO_ENDPOINTS_TABLES_MAPPING_V**: Enhanced mapping view linking to BASE_NAMES and BASE_TABLE primary keys for complete relationship tracking
+
+        ### Business Intelligence Tables:
+        - **THOUGHTSPOT_TABLE**: Raw data showing which views or base tables are utilized by ThoughtSpot
+        - **THOUGHTSPOT_TABLE_V**: Enhanced ThoughtSpot integration view linked to BASE_TABLE and BASE_NAMES primary keys
+        ### Stored Procedure Tables:
+        - **SP_TABLE_COLUMN_MAPPING**: Complete stored procedure metadata including associated tables and column information
+        - **SP_TABLE_COLUMN_MAPPING_V**: Enhanced stored procedure mappings linked to base/view tables
+        - **SP_REFERENCE_TO_FLOWS**: Flow reference data identifying stored procedures with flow dependencies
+        - **SP_MAPPING_WITH_ENDPOINTS_AND_FLOWS_V**: Comprehensive stored procedure mapping showing API endpoint triggers and flow triggers, linkable to ACTION_TO_ENDPOINTS_TABLES_MAPPING via stored procedure and flow_calls fields
+
+        ### Prefect Flows reference Tables:
+        - **PREFECT_REFERENCE_WITH_TABLES_COLUMNS**: Raw data containing base_table and view_table references found in the Prefect repository, indicating tables and columns likely involved in workflow flows operations 
+        - **PREFECT_REFERENCE_WITH_TABLES_COLUMNS_V**: Enhanced Prefect reference view that provides relationships with primary keys linking to BASE_TABLE and VIEW_TABLE for complete workflow-to-data lineage tracking gives you relationship to BASE_TABLE and VIEW_TABLE as well with primary keys where BASE_TABLE and VIEW_TABLE has primary keys of BASE_NAMES and VIEW_NAMES
+        ## Instructions:
+        1. **Always query live data**: Use MCP tools to get current information rather than making assumptions
+        2. **Start with schema queries**: When exploring unfamiliar tables, first get the schema to understand available columns
+        3. **Use appropriate limits**: Start with small limits (10-50 rows) to understand data structure, then increase as needed
+        4. **Leverage enhanced views**: Use *_V tables for complete relationship analysis and raw tables for detailed technical information for lineage tracing
+        5. **Provide data-driven responses**: Base all architecture analysis on actual queried data
+
+context:
+  - provider: diff
+  - provider: folder
+    params:
+      folders:
+        - .
+  - provider: codebase
+  - provider: code
+  - provider: docs
+  - provider: terminal
+  - provider: problems
+# MCP Server Configuration
+mcpServers:
+  - name: snowflake-architecture
+    command: "C:\\dev1\\mcp-with-snowflake-for-claude\\.venv\\Scripts\\python.exe"
+    args: ["mcp_snowflake_server.py"]
+    cwd: "C:\\dev1\\mcp-with-snowflake-for-claude"
+
+allowAnonymousTelemetry: true

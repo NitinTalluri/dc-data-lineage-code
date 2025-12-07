@@ -1,0 +1,19 @@
+# Core dependencies
+sqlglot>=20.0.0
+pandas>=1.5.0
+sqlalchemy>=1.4.0
+
+# Snowflake connector (if using snowflake-sqlalchemy)
+snowflake-connector-python>=3.0.0
+snowflake-sqlalchemy>=1.4.0
+
+# Optional: For better performance and additional features
+numpy>=1.21.0
+pyarrow>=10.0.0
+
+# Development dependencies (optional)
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=22.0.0
+flake8>=5.0.0
+mypy>=1.0.0

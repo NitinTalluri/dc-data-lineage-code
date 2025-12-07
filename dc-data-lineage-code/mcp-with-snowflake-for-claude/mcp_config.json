@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "snowflake-architecture": {
+      "command": "python",
+      "args": ["mcp_snowflake_server.py"],
+      "env": {
+        "PYTHONPATH": "."
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+[project]
+name = "ddl-column-lineage-analyzer"
+version = "1.0.0"
+description = "DDL Column Lineage Analysis Tool"
+dependencies = [
+    "pandas>=2.0.0",
+    "sqlalchemy>=2.0.0",
+    "sqlglot>=20.0.0",
+]
+requires-python = ">=3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
